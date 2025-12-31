@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple-C 编译器前端 - 课程设计答辩</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/black.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.css">
+    <style>
+        :root {
+            --r-heading-text-transform: none;
+            --r-main-font-size: 38px;
+        }
+        .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+        
+        /* 代码块优化：居中且不过宽 */
+        .reveal pre { width: 90%; margin: 20px auto; font-size: 0.75em; box-shadow: none; }
+        .reveal pre code { max-height: 750px; padding: 25px; line-height: 1.35; border-radius: 10px; }
+        
+        /* 表格优化：居中，限制宽度 */
+        .reveal table { font-size: 0.85em; margin: 30px auto; width: 85%; border-collapse: collapse; }
+        .reveal table th { background: #333; color: #42affa; border-bottom: 3px solid #555; }
+        .reveal table td, .reveal table th { padding: 15px 25px; border: 1px solid #444; text-align: center; }
+        .reveal table tr:nth-child(even) { background-color: #222; }
+        
+        /* 辅助字号 */
+        .reveal .small { font-size: 0.7em; opacity: 0.8; }
+        .reveal .tiny { font-size: 0.6em; opacity: 0.6; }
+        
+        .highlight { color: #42affa; font-weight: bold; }
+        .success { color: #4caf50; }
+        .warning { color: #ff9800; }
+        .error { color: #f44336; }
+        
+        /* 布局优化：限制最大宽度防止拉伸，强制居中 */
+        .two-columns { display: flex; gap: 60px; justify-content: center; align-items: flex-start; max-width: 1600px; margin: 0 auto; }
+        .two-columns > div { flex: 1; }
+        
+        .three-columns { display: flex; gap: 50px; justify-content: center; align-items: flex-start; max-width: 1700px; margin: 0 auto; }
+        .three-columns > div { flex: 1; }
+        
+        /* 流程图：增加间距，防止挤压 */
+        .flow-chart { display: flex; align-items: center; justify-content: center; gap: 20px; font-size: 0.8em; flex-wrap: wrap; margin-top: 40px; }
+        .flow-box { background: linear-gradient(135deg, #1a1a2e, #16213e); padding: 20px 30px; border-radius: 12px; border: 2px solid #42affa; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.4); min-width: 120px; }
+        .flow-box.active { border-color: #4caf50; background: linear-gradient(135deg, #1a2e1a, #162e21); box-shadow: 0 0 15px rgba(76, 175, 80, 0.4); }
+        .flow-arrow { font-size: 1.8em; color: #42affa; margin: 0 15px; font-weight: bold; }
+        
+        /* 文本框 */
+        .code-box { background: #1b1b1b; padding: 25px; border-radius: 15px; text-align: left; border: 1px solid #333; }
+        .reveal blockquote { background: #252525; border-left: 8px solid #42affa; padding: 30px 40px; font-style: normal; width: 80%; margin: 40px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); font-size: 1.1em; }
+        
+        .badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 0.75em; margin: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .badge-blue { background: #1976d2; }
+        .badge-green { background: #388e3c; }
+        .badge-orange { background: #f57c00; }
+        
+        .reveal ul, .reveal ol { line-height: 1.6; }
+        .reveal ul li, .reveal ol li { margin-bottom: 10px; }
+        .icon { font-size: 1.4em; margin-right: 12px; }
+        
+        /* 新版章节页样式 */
+        .section-slide { text-align: left; padding-left: 50px !important; }
+        .section-num { 
+            font-size: 5em; 
+            font-weight: 900; 
+            color: rgba(66, 175, 250, 0.2); 
+            line-height: 0.8; 
+            position: absolute; 
+            top: 20px; 
+            left: 40px;
+            z-index: 0;   /* 确保在底层 */
+            user-select: none;
+        }
+        .section-title-box {
+            margin-top: 100px;
+            border-left: 10px solid #42affa;
+            padding-left: 40px;
+            position: relative; /* 启用层级控制 */
+            z-index: 1;         /* 确保在文字上层 */
+        }
+        .reveal h2.section-title { 
+            font-size: 2.8em; 
+            margin: 0; 
+            text-transform: none; 
+            text-align: left;
+            line-height: 1.2;
+        }
+        .section-subtitle { 
+            color: #aaa; 
+            font-size: 1.2em; 
+            margin-top: 20px; 
+            font-weight: 300;
+            text-align: left;
+        }
+
+        /* 目录页美化 */
+        .toc-card {
+            background: rgba(30, 30, 40, 0.8);
+            border: 1px solid #444;
+            border-top: 4px solid #42affa;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: left;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            height: 100%;
+            transition: transform 0.3s;
+        }
+        .toc-card:hover { transform: translateY(-5px); border-top-color: #4caf50; }
+        .toc-title { font-size: 1.3em; margin-bottom: 20px; font-weight: bold; color: #fff; border-bottom: 1px solid #444; padding-bottom: 15px; }
+        .toc-list { list-style: none; padding: 0; margin: 0; }
+        .toc-list li { margin: 12px 0; font-size: 0.9em; display: flex; align-items: center; }
+        .toc-num { 
+            display: inline-block; width: 30px; height: 30px; 
+            background: #333; color: #42affa; 
+            border-radius: 50%; text-align: center; line-height: 30px; 
+            font-size: 0.7em; margin-right: 15px; font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ==================== 封面 ==================== -->
+<section data-background-gradient="linear-gradient(to bottom, #1a1a2e, #16213e)">
+    <h1 style="font-size: 3.5em; margin-bottom: 20px;">🔧 Simple-C 编译器前端</h1>
+    <h3 style="color: #42affa; font-size: 1.8em;">编译原理课程设计</h3>
+    
+    <!-- 学生信息 -->
+    <div style="margin-top: 60px; margin-bottom: 60px;">
+        <p style="font-size: 1.6em; font-weight: bold; margin: 0;">李易涵</p>
+        <p style="font-size: 1.1em; color: #aaa; margin-top: 10px; font-family: monospace;">302023315218</p>
+    </div>
+
+    <p style="font-size: 1.2em;">
+        技术栈：Python + LLVM
+    </p>
+    <p style="margin-top: 40px; font-size: 0.9em; color: #888;">
+        词法分析 → 语法分析 → 语义分析 → 中间代码生成
+    </p>
+</section>
+
+<!-- ==================== 目录 ==================== -->
+<section>
+    <h2>📋 目录</h2>
+    <div class="three-columns" style="font-size: 1.2em; margin-top: 60px;">
+        <div class="toc-card">
+            <div class="toc-title">📘 理论部分</div>
+            <ul class="toc-list">
+                <li><span class="toc-num">01</span> 项目概述</li>
+                <li><span class="toc-num">02</span> 编译器原理</li>
+                <li><span class="toc-num">03</span> 系统架构</li>
+            </ul>
+        </div>
+        <div class="toc-card" style="border-top-color: #4caf50;">
+            <div class="toc-title">💻 实现部分</div>
+            <ul class="toc-list">
+                <li><span class="toc-num">04</span> 词法分析</li>
+                <li><span class="toc-num">05</span> 语法分析</li>
+                <li><span class="toc-num">06</span> 语义分析</li>
+                <li><span class="toc-num">07</span> 代码生成</li>
+            </ul>
+        </div>
+        <div class="toc-card" style="border-top-color: #ff9800;">
+            <div class="toc-title">🚀 展示部分</div>
+            <ul class="toc-list">
+                <li><span class="toc-num">08</span> 运行演示</li>
+                <li><span class="toc-num">09</span> 项目亮点</li>
+                <li><span class="toc-num">10</span> 总结与展望</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 1. 项目概述 ==================== -->
+<section>
+    <section data-background-gradient="linear-gradient(to bottom right, #1a1a2e, #0f3460)">
+        <div class="section-num">01</div>
+        <div class="section-title-box">
+            <h2 class="section-title">项目概述</h2>
+            <div class="section-subtitle">Project Overview</div>
+        </div>
+    </section>
+    <section>
+        <h3>项目目标</h3>
+        <blockquote>
+            实现一个完整的 <span class="highlight">编译器前端</span>，将自定义语言编译为中间代码
+        </blockquote>
+        <div class="three-columns" style="margin-top: 30px; font-size: 0.9em;">
+            <div style="text-align: center;">
+                <p style="font-size: 2em;">📝</p>
+                <p><strong>设计语言</strong></p>
+                <p>Simple-C<br>类 C 语法</p>
+            </div>
+            <div style="text-align: center;">
+                <p style="font-size: 2em;">⚙️</p>
+                <p><strong>编译目标</strong></p>
+                <p>LLVM IR<br>工业级中间代码</p>
+            </div>
+            <div style="text-align: center;">
+                <p style="font-size: 2em;">🚀</p>
+                <p><strong>可执行</strong></p>
+                <p>JIT 即时编译<br>直接运行</p>
+            </div>
+        </div>
+    </section>
+    <section>
+        <h3>技术选型</h3>
+        <table>
+            <tr><th>组件</th><th>技术选择</th><th>选型理由</th></tr>
+            <tr><td>实现语言</td><td><span class="badge badge-blue">Python 3.10+</span></td><td>开发效率高，易于理解</td></tr>
+            <tr><td>LLVM 绑定</td><td><span class="badge badge-green">llvmlite</span></td><td>轻量级，Numba 团队维护</td></tr>
+            <tr><td>词法分析</td><td><span class="badge badge-orange">手写 Lexer</span></td><td>展示原理，完全掌控</td></tr>
+            <tr><td>语法分析</td><td><span class="badge badge-orange">递归下降</span></td><td>LL 分析，简洁直观</td></tr>
+            <tr><td>中间代码</td><td><span class="badge badge-green">LLVM IR</span></td><td>工业标准，可直接执行</td></tr>
+        </table>
+    </section>
+    <section>
+        <h3>Simple-C 语言特性</h3>
+        <div class="two-columns">
+            <div>
+                <p style="font-size: 1.2em; margin-bottom: 20px;"><strong>支持的特性：</strong></p>
+                <ul style="font-size: 0.9em; line-height: 1.8;">
+                    <li>数据类型：int, float, bool, void</li>
+                    <li>变量声明：let x: int = 10;</li>
+                    <li>函数定义：func name() -> type</li>
+                    <li>控制流：if/else, while</li>
+                    <li>算术运算：+, -, *, /, %</li>
+                    <li>比较运算：<, >, <=, >=, ==, !=</li>
+                    <li>逻辑运算：&&, ||, !</li>
+                    <li>递归函数调用</li>
+                </ul>
+            </div>
+            <div>
+                <pre><code class="language-c">// 阶乘示例
+func factorial(n: int) -> int {
+    if (n <= 1) {
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
+
+func main() -> int {
+    let result: int = factorial(5);
+    print(result);
+    return 0;
+}</code></pre>
+            </div>
+        </div>
+    </section>
+</section>
+
+<!-- ==================== 2. 编译器原理 ==================== -->
+<section>
+    <section data-background-gradient="linear-gradient(to bottom right, #1a1a2e, #0f3460)">
+        <div class="section-num">02</div>
+        <div class="section-title-box">
+            <h2 class="section-title">编译器原理</h2>
+            <div class="section-subtitle">Compiler Theory</div>
+        </div>
+    </section>
+    <section>
+        <h3>什么是编译器？</h3>
+        <blockquote>
+            编译器是一个程序，将 <span class="highlight">源语言</span> 程序翻译成 <span class="highlight">目标语言</span> 程序
+        </blockquote>
+        <div class="flow-chart" style="margin-top: 40px;">
+            <div class="flow-box">源代码<br><small>C / Java / Python</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box" style="border-color: #4caf50;">编译器<br><small>Compiler</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box">目标代码<br><small>机器码 / 字节码</small></div>
+        </div>
+        <p style="margin-top: 30px; font-size: 0.7em;">
+            💡 类比：编译器 = 翻译官（把中文翻译成英文）
+        </p>
+    </section>
+    <section>
+        <h3>编译的六个阶段</h3>
+        <div class="flow-chart" style="flex-wrap: nowrap; font-size: 0.9em; gap: 15px;">
+            <div class="flow-box active" style="padding: 15px 20px;">词法分析<br><small>Lexer</small></div>
+            <div class="flow-arrow" style="font-size: 1.5em;">→</div>
+            <div class="flow-box active" style="padding: 15px 20px;">语法分析<br><small>Parser</small></div>
+            <div class="flow-arrow" style="font-size: 1.5em;">→</div>
+            <div class="flow-box active" style="padding: 15px 20px;">语义分析<br><small>Semantic</small></div>
+            <div class="flow-arrow" style="font-size: 1.5em;">→</div>
+            <div class="flow-box active" style="padding: 15px 20px;">中间代码<br><small>IR Gen</small></div>
+            <div class="flow-arrow" style="font-size: 1.5em;">→</div>
+            <div class="flow-box" style="padding: 15px 20px;">代码优化<br><small>Optimize</small></div>
+            <div class="flow-arrow" style="font-size: 1.5em;">→</div>
+            <div class="flow-box" style="padding: 15px 20px;">目标代码<br><small>CodeGen</small></div>
+        </div>
+        <p style="margin-top: 20px; font-size: 0.65em;">
+            <span class="success">■ 绿色 = 本项目实现</span> &nbsp;&nbsp;
+            <span style="color: #42affa;">■ 蓝色 = LLVM 负责</span>
+        </p>
+    </section>
+    <section>
+        <h3>前端 vs 后端</h3>
+        <table>
+            <tr><th></th><th>前端 (Front-end)</th><th>后端 (Back-end)</th></tr>
+            <tr><td><strong>阶段</strong></td><td>词法、语法、语义、IR</td><td>优化、目标代码生成</td></tr>
+            <tr><td><strong>关注点</strong></td><td>源语言相关</td><td>目标平台相关</td></tr>
+            <tr><td><strong>输出</strong></td><td>中间表示 (IR)</td><td>可执行文件</td></tr>
+            <tr><td><strong>本项目</strong></td><td class="success">✅ 完全实现</td><td>使用 LLVM</td></tr>
+        </table>
+        <p style="margin-top: 20px; font-size: 0.7em;">
+            💡 前后端分离：一个前端可配合多个后端（跨平台）
+        </p>
+    </section>
+    <section>
+        <h3>为什么选择 LLVM？</h3>
+        <div class="two-columns" style="font-size: 0.9em;">
+            <div>
+                <p><strong>LLVM 是什么？</strong></p>
+                <ul>
+                    <li>Low Level Virtual Machine</li>
+                    <li>模块化的编译器框架</li>
+                    <li>2003 年由 Chris Lattner 创建</li>
+                </ul>
+                <p style="margin-top: 20px;"><strong>谁在使用？</strong></p>
+                <ul>
+                    <li>Clang (C/C++)</li>
+                    <li>Rust</li>
+                    <li>Swift</li>
+                    <li>Julia</li>
+                </ul>
+            </div>
+            <div>
+                <p><strong>LLVM 的优势</strong></p>
+                <ul>
+                    <li>🎯 <strong>工业标准</strong>：久经验证</li>
+                    <li>⚡ <strong>优化强大</strong>：自动优化</li>
+                    <li>🖥️ <strong>多平台</strong>：x86, ARM, ...</li>
+                    <li>🔥 <strong>JIT 支持</strong>：可直接运行</li>
+                    <li>📚 <strong>文档完善</strong>：易于学习</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</section>
+
+<!-- ==================== 3. 系统架构 ==================== -->
+<section>
+    <section data-background-gradient="linear-gradient(to bottom right, #1a1a2e, #0f3460)">
+        <div class="section-num">03</div>
+        <div class="section-title-box">
+            <h2 class="section-title">系统架构</h2>
+            <div class="section-subtitle">System Architecture</div>
+        </div>
+    </section>
+    <section>
+        <h3>数据流图</h3>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; font-size: 0.8em;">
+            <!-- 上层：处理阶段 + 箭头 -->
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <div style="width: 250px; background: linear-gradient(135deg, #2d4a3e, #1a3a2a); border: 2px solid #4caf50; padding: 15px 10px; border-radius: 12px; text-align: center;">
+                    <div style="font-weight: bold; font-size: 1.2em; white-space: nowrap;">📄 源代码</div>
+                    <div style="font-size: 0.9em; color: #aaa;">.sc 文件</div>
+                </div>
+                <div style="width: 60px; text-align: center; color: #4caf50; font-size: 2.2em;">→</div>
+                <div style="width: 250px; background: linear-gradient(135deg, #1a2e1a, #162e21); border: 2px solid #4caf50; padding: 15px 10px; border-radius: 12px; text-align: center;">
+                    <div style="font-weight: bold; font-size: 1.2em; white-space: nowrap;">🔍 词法分析</div>
+                    <div style="font-size: 0.9em; color: #aaa;">Lexer</div>
+                </div>
+                <div style="width: 60px; text-align: center; color: #4caf50; font-size: 2.2em;">→</div>
+                <div style="width: 250px; background: linear-gradient(135deg, #1a2e1a, #162e21); border: 2px solid #4caf50; padding: 15px 10px; border-radius: 12px; text-align: center;">
+                    <div style="font-weight: bold; font-size: 1.2em; white-space: nowrap;">🌳 语法分析</div>
+                    <div style="font-size: 0.9em; color: #aaa;">Parser</div>
+                </div>
+                <div style="width: 60px; text-align: center; color: #4caf50; font-size: 2.2em;">→</div>
+                <div style="width: 250px; background: linear-gradient(135deg, #1a2e1a, #162e21); border: 2px solid #4caf50; padding: 15px 10px; border-radius: 12px; text-align: center;">
+                    <div style="font-weight: bold; font-size: 1.2em; white-space: nowrap;">✅ 语义分析</div>
+                    <div style="font-size: 0.9em; color: #aaa;">Semantic</div>
+                </div>
+                <div style="width: 60px; text-align: center; color: #4caf50; font-size: 2.2em;">→</div>
+                <div style="width: 250px; background: linear-gradient(135deg, #1a2e1a, #162e21); border: 2px solid #4caf50; padding: 15px 10px; border-radius: 12px; text-align: center;">
+                    <div style="font-weight: bold; font-size: 1.2em; white-space: nowrap;">⚙️ 代码生成</div>
+                    <div style="font-size: 0.9em; color: #aaa;">LLVM IR</div>
+                </div>
+            </div>
+            <!-- 下箭头行 -->
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <div style="width: 250px;"></div>
+                <div style="width: 60px;"></div>
+                <div style="width: 250px; text-align: center; color: #42affa; font-size: 2em;">↓</div>
+                <div style="width: 60px;"></div>
+                <div style="width: 250px; text-align: center; color: #42affa; font-size: 2em;">↓</div>
+                <div style="width: 60px;"></div>
+                <div style="width: 250px; text-align: center; color: #42affa; font-size: 2em;">↓</div>
+                <div style="width: 60px;"></div>
+                <div style="width: 250px; text-align: center; color: #42affa; font-size: 2em;">↓</div>
+            </div>
+            <!-- 下层：输出产物 -->
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <div style="width: 250px;"></div>
+                <div style="width: 60px;"></div>
+                <div style="width: 250px; background: #1e3a5f; border: 2px solid #42affa; padding: 12px 10px; border-radius: 12px; text-align: center;">
+                    <div style="font-weight: bold; font-size: 1.1em;">Token 流</div>
+                </div>
+                <div style="width: 60px;"></div>
+                <div style="width: 250px; background: #1e3a5f; border: 2px solid #42affa; padding: 12px 10px; border-radius: 12px; text-align: center;">
+                    <div style="font-weight: bold; font-size: 1.1em;">AST</div>
+                </div>
+                <div style="width: 60px;"></div>
+                <div style="width: 250px; background: #1e3a5f; border: 2px solid #42affa; padding: 12px 10px; border-radius: 12px; text-align: center;">
+                    <div style="font-weight: bold; font-size: 1.1em;">符号表</div>
+                </div>
+                <div style="width: 60px;"></div>
+                <div style="width: 250px; background: #1e3a5f; border: 2px solid #42affa; padding: 12px 10px; border-radius: 12px; text-align: center;">
+                    <div style="font-weight: bold; font-size: 1.1em;">.ll 文件</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section>
+        <h3>项目目录结构</h3>
+        <pre><code class="language-plaintext">Compiler_Principles/
+├── src/
+│   ├── main.py              # 入口 + CLI
+│   ├── lexer/
+│   │   ├── tokens.py        # Token 类型定义 (45 种)
+│   │   └── lexer.py         # 词法分析器 (250 行)
+│   ├── parser/
+│   │   ├── ast_nodes.py     # AST 节点定义 (20+ 种)
+│   │   └── parser.py        # 递归下降解析器 (500 行)
+│   ├── semantic/
+│   │   ├── symbol_table.py  # 符号表 + 作用域
+│   │   └── analyzer.py      # 语义分析器 (300 行)
+│   └── codegen/
+│       └── llvm_generator.py  # LLVM IR 生成 (450 行)
+└── examples/                 # 4 个示例程序</code></pre>
+    </section>
+    <section>
+        <h3>代码统计</h3>
+        <table>
+            <tr><th>模块</th><th>文件数</th><th>代码行数</th><th>核心类</th></tr>
+            <tr><td>词法分析</td><td>2</td><td>~350</td><td>Lexer, Token, TokenType</td></tr>
+            <tr><td>语法分析</td><td>2</td><td>~800</td><td>Parser, 20+ ASTNode</td></tr>
+            <tr><td>语义分析</td><td>2</td><td>~400</td><td>SemanticAnalyzer, SymbolTable</td></tr>
+            <tr><td>代码生成</td><td>1</td><td>~500</td><td>LLVMCodeGenerator, JITEngine</td></tr>
+            <tr style="font-weight: bold;"><td>合计</td><td>7</td><td>~2000</td><td>-</td></tr>
+        </table>
+    </section>
+</section>
+
+<!-- ==================== 4. 词法分析 ==================== -->
+<section>
+    <section data-background-gradient="linear-gradient(to bottom right, #1a1a2e, #0f3460)">
+        <div class="section-num">04</div>
+        <div class="section-title-box">
+            <h2 class="section-title">词法分析</h2>
+            <div class="section-subtitle">Lexical Analysis</div>
+        </div>
+    </section>
+    <section>
+        <h3>词法分析的作用</h3>
+        <blockquote>
+            将 <span class="highlight">字符流</span> 分解成 <span class="highlight">Token（词法单元）</span>
+        </blockquote>
+        <div class="two-columns" style="margin-top: 25px;">
+            <div>
+                <p><strong>输入（字符流）：</strong></p>
+                <pre><code>let x = 10 + 5;</code></pre>
+            </div>
+            <div>
+                <p><strong>输出（Token 流）：</strong></p>
+                <pre><code class="nohighlight">[LET] [ID:x] [=] [10] [+] [5] [SEMI]</code></pre>
+            </div>
+        </div>
+        <p style="margin-top: 20px; font-size: 0.7em;">
+            💡 类比：把一句话分解成一个个单词
+        </p>
+    </section>
+    <section>
+        <h3>Token 类型设计</h3>
+        <table style="font-size: 0.85em;">
+            <tr><th>类别</th><th>Token 类型</th><th>示例</th></tr>
+            <tr><td>关键字</td><td>FUNC, LET, IF, ELSE, WHILE, FOR, RETURN</td><td>func, let, if</td></tr>
+            <tr><td>类型</td><td>INT, FLOAT, BOOL, VOID</td><td>int, float</td></tr>
+            <tr><td>字面量</td><td>INT_LITERAL, FLOAT_LITERAL, TRUE, FALSE</td><td>123, 3.14</td></tr>
+            <tr><td>算术</td><td>PLUS, MINUS, STAR, SLASH, PERCENT</td><td>+, -, *, /, %</td></tr>
+            <tr><td>比较</td><td>EQ, NE, LT, GT, LE, GE</td><td>==, !=, <, ></td></tr>
+            <tr><td>逻辑</td><td>AND, OR, NOT</td><td>&&, ||, !</td></tr>
+            <tr><td>分隔符</td><td>LPAREN, RPAREN, LBRACE, RBRACE, SEMICOLON, ...</td><td>( ) { } ;</td></tr>
+        </table>
+        <p class="small" style="margin-top: 15px;">共定义 <strong>45</strong> 种 Token 类型</p>
+    </section>
+    <section>
+        <h3>Token 数据结构</h3>
+        <pre><code class="language-python">@dataclass
+class Token:
+    type: TokenType    # Token 类型
+    value: Any         # 实际值
+    line: int          # 行号（错误定位）
+    column: int        # 列号（错误定位）
+
+# 示例
+Token(TokenType.INT_LITERAL, 42, line=3, col=10)
+Token(TokenType.IDENTIFIER, "factorial", line=5, col=1)</code></pre>
+    </section>
+    <section>
+        <h3>词法分析器实现</h3>
+        <pre><code class="language-python">class Lexer:
+    def get_next_token(self) -> Token:
+        while self.current_char:
+            # 1. 跳过空白和注释
+            if self.current_char.isspace():
+                self.skip_whitespace()
+                continue
+            if self.current_char == '/' and self.peek() == '/':
+                self.skip_comment()
+                continue
+            
+            # 2. 识别数字
+            if self.current_char.isdigit():
+                return self.read_number()
+            
+            # 3. 识别标识符/关键字
+            if self.current_char.isalpha():
+                return self.read_identifier()
+            
+            # 4. 识别运算符
+            if self.current_char == '=':
+                if self.peek() == '=':
+                    return Token(EQ, '==')  # ==
+                return Token(ASSIGN, '=')   # =
+            # ...</code></pre>
+    </section>
+    <section>
+        <h3>理论基础：有限自动机</h3>
+        <div class="two-columns" style="margin-top: 10px;">
+            <div style="text-align: center;">
+                <img src="dfa_diagrams.svg" alt="整数 DFA" style="width: 80%; height: auto; transform: scale(1.3); transform-origin: center;">
+            </div>
+            <div style="text-align: center;">
+                <img src="dfa_diagrams2.svg" alt="标识符 DFA" style="width: 80%; height: auto; transform: scale(1.3); transform-origin: center;">
+            </div>
+        </div>
+        <p style="margin-top: 30px; font-size: 0.6em; color: #888;">
+            ○ 单圈 = 普通状态 &nbsp;&nbsp; ◎ 双圈 = 接受状态
+        </p>
+    </section>
+</section>
+
+<!-- ==================== 5. 语法分析 ==================== -->
+<section>
+    <section data-background-gradient="linear-gradient(to bottom right, #1a1a2e, #0f3460)">
+        <div class="section-num">05</div>
+        <div class="section-title-box">
+            <h2 class="section-title">语法分析</h2>
+            <div class="section-subtitle">Syntax Analysis / Parsing</div>
+        </div>
+    </section>
+    <section>
+        <h3>语法分析的作用</h3>
+        <blockquote>
+            将 <span class="highlight">Token 流</span> 按语法规则组织成 <span class="highlight">抽象语法树 (AST)</span>
+        </blockquote>
+        <p style="font-size: 0.7em; margin-top: 20px;">
+            💡 类比：把单词按照语法规则组成句子结构（主语+谓语+宾语）
+        </p>
+    </section>
+    <section>
+        <h3>什么是 AST？</h3>
+        <div class="two-columns">
+            <div>
+                <p><strong>表达式：</strong><code>a + b * c</code></p>
+                <p style="font-size: 0.7em; color: #888;">AST 表示优先级关系：</p>
+<pre style="background: transparent; font-size: 0.8em; line-height: 1.2; font-family: 'Courier New', monospace; font-weight: bold; border: none; box-shadow: none;">
+        (+)
+       /   \
+      a    (*)
+          /   \
+         b     c
+</pre>
+            </div>
+            <div>
+                <p><strong>if 语句：</strong></p>
+                <p style="font-size: 0.7em; color: #888;">AST 表示控制流结构：</p>
+<pre style="background: transparent; font-size: 0.8em; line-height: 1.2; font-family: 'Courier New', monospace; font-weight: bold; border: none; box-shadow: none;">
+     IfStmt
+    /   |   \
+ cond  then  else
+   |     |     |
+(x>0) Block  Block
+</pre>
+            </div>
+        </div>
+    </section>
+    <section>
+        <h3>EBNF 语法规范</h3>
+        <pre><code class="language-ebnf">program     = { function_decl } ;
+function    = "func" ID "(" params ")" "->" type block ;
+block       = "{" { statement } "}" ;
+statement   = var_decl | if_stmt | while_stmt | return_stmt | expr_stmt ;
+
+(* 表达式优先级：低 → 高 *)
+expression  = logic_or ;
+logic_or    = logic_and { "||" logic_and } ;
+logic_and   = equality { "&&" equality } ;
+equality    = comparison { ("==" | "!=") comparison } ;
+comparison  = term { ("<" | ">" | "<=" | ">=") term } ;
+term        = factor { ("+" | "-") factor } ;
+factor      = unary { ("*" | "/" | "%") unary } ;
+unary       = ("!" | "-") unary | call ;
+call        = primary [ "(" args ")" ] ;
+primary     = INT | FLOAT | BOOL | ID | "(" expression ")" ;</code></pre>
+    </section>
+    <section>
+        <h3>递归下降分析法</h3>
+        <p><strong>核心思想：每条语法规则 = 一个函数</strong></p>
+        <pre><code class="language-python">def parse_term(self) -> Expression:
+    """term = factor { ("+" | "-") factor}"""
+    left = self.parse_factor()      # 先解析更高优先级
+    
+    while self.check(PLUS, MINUS):  # 循环处理同优先级
+        op = self.advance()
+        right = self.parse_factor()
+        left = BinaryExpr(op, left, right)
+    
+    return left</code></pre>
+        <p class="small" style="margin-top: 15px;">
+            ✅ 自顶向下分析 &nbsp; ✅ LL 分析器 &nbsp; ✅ 简洁直观
+        </p>
+    </section>
+    <section>
+        <h3>运算符优先级处理</h3>
+        <table style="font-size: 0.85em;">
+            <tr><th>优先级</th><th>运算符</th><th>解析函数</th><th>结合性</th></tr>
+            <tr><td>1 (最低)</td><td>||</td><td>parse_or()</td><td>左结合</td></tr>
+            <tr><td>2</td><td>&&</td><td>parse_and()</td><td>左结合</td></tr>
+            <tr><td>3</td><td>== !=</td><td>parse_equality()</td><td>左结合</td></tr>
+            <tr><td>4</td><td>< > <= >=</td><td>parse_comparison()</td><td>左结合</td></tr>
+            <tr><td>5</td><td>+ -</td><td>parse_term()</td><td>左结合</td></tr>
+            <tr><td>6</td><td>* / %</td><td>parse_factor()</td><td>左结合</td></tr>
+            <tr><td>7 (最高)</td><td>! - (一元)</td><td>parse_unary()</td><td>右结合</td></tr>
+        </table>
+        <p class="small" style="margin-top: 15px;">通过函数调用层级自然实现优先级</p>
+    </section>
+    <section>
+        <h3>AST 节点设计</h3>
+        <pre><code class="language-python"># 表达式节点
+@dataclass
+class BinaryExpr(Expression):    # a + b
+    operator: str
+    left: Expression
+    right: Expression
+
+@dataclass
+class CallExpr(Expression):      # func(a, b)
+    callee: str
+    arguments: List[Expression]
+
+# 语句节点  
+@dataclass
+class IfStmt(Statement):
+    condition: Expression
+    then_branch: Block
+    else_branch: Optional[Block]
+
+@dataclass
+class FunctionDecl(ASTNode):
+    name: str
+    params: List[Parameter]
+    return_type: str
+    body: Block</code></pre>
+    </section>
+    <section>
+        <h3>LL vs LR 分析</h3>
+        <table>
+            <tr><th></th><th>LL 分析（本项目）</th><th>LR 分析</th></tr>
+            <tr><td><strong>方向</strong></td><td>自顶向下</td><td>自底向上</td></tr>
+            <tr><td><strong>推导</strong></td><td>最左推导</td><td>最右推导的逆</td></tr>
+            <tr><td><strong>实现</strong></td><td>递归下降</td><td>移进-归约</td></tr>
+            <tr><td><strong>工具</strong></td><td>手写</td><td>yacc/bison</td></tr>
+            <tr><td><strong>能力</strong></td><td>较弱</td><td>更强大</td></tr>
+            <tr><td><strong>复杂度</strong></td><td class="success">简单</td><td>复杂</td></tr>
+        </table>
+    </section>
+</section>
+
+<!-- ==================== 6. 语义分析 ==================== -->
+<section>
+    <section data-background-gradient="linear-gradient(to bottom right, #1a1a2e, #0f3460)">
+        <div class="section-num">06</div>
+        <div class="section-title-box">
+            <h2 class="section-title">语义分析</h2>
+            <div class="section-subtitle">Semantic Analysis</div>
+        </div>
+    </section>
+    <section>
+        <h3>语义分析的作用</h3>
+        <blockquote>
+            检查程序的 <span class="highlight">逻辑正确性</span>（语法正确 ≠ 语义正确）
+        </blockquote>
+        <div style="margin-top: 25px;">
+            <pre><code class="language-c">// 语法正确，但语义错误的例子
+int x = "hello";        // ❌ 类型不匹配
+y = 10;                 // ❌ 变量 y 未声明
+add(1);                 // ❌ 参数数量不对
+func foo() -> int { }   // ❌ 缺少 return 语句</code></pre>
+        </div>
+    </section>
+    <section>
+        <h3>检查内容</h3>
+        <table>
+            <tr><th>检查项</th><th>说明</th><th>示例</th></tr>
+            <tr><td>类型检查</td><td>表达式类型兼容性</td><td>int + float → float</td></tr>
+            <tr><td>变量声明</td><td>使用前必须声明</td><td>print(x); // x 未定义</td></tr>
+            <tr><td>重复声明</td><td>同一作用域不能重复</td><td>let x = 1; let x = 2;</td></tr>
+            <tr><td>函数调用</td><td>参数数量和类型</td><td>add(1, 2) vs add(1)</td></tr>
+            <tr><td>返回类型</td><td>与声明一致</td><td>func foo() -> int { return "x"; }</td></tr>
+        </table>
+    </section>
+    <section>
+        <h3>符号表设计</h3>
+        <pre><code class="language-python">@dataclass
+class Symbol:
+    name: str           # 符号名
+    kind: SymbolKind    # VARIABLE / FUNCTION / PARAMETER
+    data_type: str      # int / float / bool
+    # 函数额外信息
+    params: List[Symbol] = []
+    return_type: str = ""
+
+class SymbolTable:
+    def define(self, symbol: Symbol):
+        """在当前作用域定义符号"""
+    
+    def lookup(self, name: str) -> Symbol:
+        """向上查找符号（包括父作用域）"""
+    
+    def enter_scope(self):  # 进入新作用域（函数/块）
+    def exit_scope(self):   # 退出当前作用域</code></pre>
+    </section>
+    <section>
+        <h3>作用域管理</h3>
+        <div class="two-columns" style="font-size: 1.0em;">
+            <div>
+                <pre><code class="language-c">func main() -> int {    // scope 1
+    let x: int = 10;
+    if (x > 0) {         // scope 2
+        let y: int = 20;
+        print(x);        // ✅ x 可见
+        print(y);        // ✅ y 可见
+    }
+    print(x);            // ✅ x 可见
+    print(y);            // ❌ y 已不可见
+}</code></pre>
+            </div>
+            <div>
+<pre style="background: transparent;">
+作用域栈：
+┌─────────────┐
+│  scope 2    │ ← y
+├─────────────┤
+│  scope 1    │ ← x, main
+├─────────────┤
+│  global     │ ← print
+└─────────────┘
+</pre>
+            </div>
+        </div>
+    </section>
+    <section>
+        <h3>类型系统</h3>
+        <table style="font-size: 0.85em;">
+            <tr><th>类型</th><th>LLVM 类型</th><th>大小</th><th>默认值</th></tr>
+            <tr><td>int</td><td>i32</td><td>32 位</td><td>0</td></tr>
+            <tr><td>float</td><td>float</td><td>32 位</td><td>0.0</td></tr>
+            <tr><td>bool</td><td>i1</td><td>1 位</td><td>false</td></tr>
+            <tr><td>void</td><td>void</td><td>-</td><td>-</td></tr>
+        </table>
+        <p style="margin-top: 20px; font-size: 0.7em;">
+            <strong>隐式类型转换：</strong>int → float（自动提升）
+        </p>
+    </section>
+</section>
+
+<!-- ==================== 7. 代码生成 ==================== -->
+<section>
+    <section data-background-gradient="linear-gradient(to bottom right, #1a1a2e, #0f3460)">
+        <div class="section-num">07</div>
+        <div class="section-title-box">
+            <h2 class="section-title">代码生成</h2>
+            <div class="section-subtitle">Code Generation (LLVM IR)</div>
+        </div>
+    </section>
+    <section>
+        <h3>LLVM IR 简介</h3>
+        <blockquote>
+            LLVM IR 是一种 <span class="highlight">强类型</span>、<span class="highlight">SSA 形式</span> 的中间表示
+        </blockquote>
+        <ul style="font-size: 0.75em; margin-top: 20px;">
+            <li><strong>强类型</strong>：每个值都有明确类型（i32, float, ...）</li>
+            <li><strong>SSA</strong>：Static Single Assignment，每个变量只赋值一次</li>
+            <li><strong>三地址码</strong>：操作最多三个操作数</li>
+        </ul>
+    </section>
+    <section>
+        <h3>代码对比</h3>
+        <div class="two-columns" style="font-size: 0.95em;">
+            <div>
+                <p><strong>Simple-C 源代码：</strong></p>
+                <pre><code class="language-c">func add(a: int, b: int) -> int {
+    let sum: int = a + b;
+    return sum;
+}</code></pre>
+            </div>
+            <div>
+                <p><strong>生成的 LLVM IR：</strong></p>
+                <pre><code class="language-llvm">define i32 @add(i32 %a, i32 %b) {
+entry:
+  %sum = alloca i32
+  %0 = add i32 %a, %b
+  store i32 %0, i32* %sum
+  %1 = load i32, i32* %sum
+  ret i32 %1
+}</code></pre>
+            </div>
+        </div>
+    </section>
+    <section>
+        <h3>指令对照表</h3>
+        <table style="font-size: 0.8em;">
+            <tr><th>Simple-C</th><th>LLVM IR</th><th>说明</th></tr>
+            <tr><td>a + b</td><td>add i32 %a, %b</td><td>整数加法</td></tr>
+            <tr><td>a - b</td><td>sub i32 %a, %b</td><td>整数减法</td></tr>
+            <tr><td>a * b</td><td>mul i32 %a, %b</td><td>整数乘法</td></tr>
+            <tr><td>a / b</td><td>sdiv i32 %a, %b</td><td>有符号除法</td></tr>
+            <tr><td>a < b</td><td>icmp slt i32 %a, %b</td><td>有符号小于比较</td></tr>
+            <tr><td>let x = ...</td><td>%x = alloca i32</td><td>栈上分配</td></tr>
+            <tr><td>x = val</td><td>store i32 %val, i32* %x</td><td>存储值</td></tr>
+            <tr><td>读取 x</td><td>load i32, i32* %x</td><td>加载值</td></tr>
+            <tr><td>return x</td><td>ret i32 %x</td><td>函数返回</td></tr>
+        </table>
+    </section>
+    <section>
+        <h3>控制流生成</h3>
+        <div class="two-columns" style="font-size: 0.95em;">
+            <div>
+                <p><strong>if 语句：</strong></p>
+                <pre><code class="language-c">if (x > 0) {
+    y = 1;
+} else {
+    y = 2;
+}</code></pre>
+            </div>
+            <div>
+                <p><strong>LLVM IR：</strong></p>
+                <pre><code class="language-llvm">  %cmp = icmp sgt i32 %x, 0
+  br i1 %cmp, label %then, label %else
+then:
+  store i32 1, i32* %y
+  br label %endif
+else:
+  store i32 2, i32* %y
+  br label %endif
+endif:
+  ; 继续执行...</code></pre>
+            </div>
+        </div>
+    </section>
+    <section>
+        <h3>代码生成器实现</h3>
+        <pre><code class="language-python">class LLVMCodeGenerator(ASTVisitor):
+    def visit_binary_expr(self, node: BinaryExpr):
+        left = self.visit(node.left)    # 递归生成左操作数
+        right = self.visit(node.right)  # 递归生成右操作数
+        
+        if node.operator == '+':
+            return self.builder.add(left, right)
+        elif node.operator == '-':
+            return self.builder.sub(left, right)
+        elif node.operator == '*':
+            return self.builder.mul(left, right)
+        elif node.operator == '<':
+            return self.builder.icmp_signed('<', left, right)
+        # ...</code></pre>
+    </section>
+    <section>
+        <h3>JIT 执行引擎</h3>
+        <pre><code class="language-python">class JITEngine:
+    def execute(self, llvm_ir: str) -> int:
+        # 1. 解析 LLVM IR
+        module = binding.parse_assembly(llvm_ir)
+        module.verify()  # 验证正确性
+        
+        # 2. 创建执行引擎
+        engine = binding.create_mcjit_compiler(module, tm)
+        
+        # 3. 获取 main 函数并执行
+        main_ptr = engine.get_function_address("main")
+        main_func = CFUNCTYPE(c_int)(main_ptr)
+        return main_func()  # 调用执行！</code></pre>
+    </section>
+</section>
+
+<!-- ==================== 8. 运行演示 ==================== -->
+<section>
+    <section data-background-gradient="linear-gradient(to bottom right, #1a1a2e, #0f3460)">
+        <div class="section-num">08</div>
+        <div class="section-title-box">
+            <h2 class="section-title">运行演示</h2>
+            <div class="section-subtitle">Live Demo</div>
+        </div>
+    </section>
+    <section>
+        <h3>命令行接口</h3>
+        <pre><code class="language-bash"># 编译并执行（默认）
+python -m src.main examples/factorial.sc
+
+# 查看词法分析结果（Token 流）
+python -m src.main examples/factorial.sc --tokens
+
+# 查看语法分析结果（AST）
+python -m src.main examples/factorial.sc --ast
+
+# 输出 LLVM IR
+python -m src.main examples/factorial.sc --emit-llvm
+
+# 输出到文件
+python -m src.main examples/factorial.sc --emit-llvm -o output.ll</code></pre>
+    </section>
+    <section>
+        <h3>测试结果</h3>
+        <table>
+            <tr><th>示例程序</th><th>功能</th><th>预期输出</th><th>状态</th></tr>
+            <tr><td>factorial.sc</td><td>递归阶乘</td><td>120 (5!)</td><td class="success">✅ 通过</td></tr>
+            <tr><td>fibonacci.sc</td><td>斐波那契数列</td><td>0,1,1,2,3,5,8,13,21,34</td><td class="success">✅ 通过</td></tr>
+            <tr><td>hello.sc</td><td>变量与输出</td><td>42</td><td class="success">✅ 通过</td></tr>
+            <tr><td>arithmetic.sc</td><td>算术运算</td><td>13,7,30,3,1,0,1,15</td><td class="success">✅ 通过</td></tr>
+        </table>
+        <p style="margin-top: 15px; font-size: 0.7em;">所有测试用例在 JIT 执行下均通过 ✅</p>
+    </section>
+    <section>
+        <h3>错误处理演示</h3>
+        <pre><code class="language-plaintext">// 词法错误
+$ python -m src.main error.sc
+Lexer Error at line 3, column 5: Unexpected character: '@'
+
+// 语法错误
+$ python -m src.main error.sc  
+Parse Error at line 5, column 10: Expected ';', got RBRACE
+
+// 语义错误
+$ python -m src.main error.sc
+Semantic Error at line 7, column 1: Undefined variable 'x'
+Semantic Error at line 10, column 5: Type mismatch: expected 'int', got 'float'</code></pre>
+    </section>
+    <section data-background-gradient="linear-gradient(135deg, #007acc, #1e1e1e)">
+        <h3>🚀 交互式 Web IDE</h3>
+        <p class="small">为了更好的演示效果，项目集成了完整的 <span class="highlight">Web 端集成开发环境</span></p>
+        <div style="margin-top: 30px;">
+            <a href="http://121.43.242.47:8080/ide" target="_blank" style="
+                display: inline-block;
+                padding: 20px 60px;
+                background: #4caf50;
+                color: white;
+                text-decoration: none;
+                border-radius: 12px;
+                font-weight: bold;
+                font-size: 1.4em;
+                box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+                transition: transform 0.2s;
+            ">
+                进入 Web IDE 演示 →
+            </a>
+        </div>
+        <div style="margin-top: 60px; display: flex; justify-content: center; gap: 60px; font-size: 0.8em; color: #aaa;">
+            <div>✓ 语法高亮</div>
+            <div>✓ 交互式 AST</div>
+            <div>✓ 多标签页</div>
+            <div>✓ 即时编译运行</div>
+        </div>
+    </section>
+</section>
+
+<!-- ==================== 9. 项目亮点 ==================== -->
+<section>
+    <section data-background-gradient="linear-gradient(to bottom right, #1a1a2e, #0f3460)">
+        <div class="section-num">09</div>
+        <div class="section-title-box">
+            <h2 class="section-title">项目亮点</h2>
+            <div class="section-subtitle">Highlights</div>
+        </div>
+    </section>
+    <section>
+        <h3>核心技术亮点</h3>
+        <div class="three-columns" style="font-size: 0.7em; margin-top: 20px;">
+            <div style="text-align: center;">
+                <p style="font-size: 2em;">🏭</p>
+                <p><strong>工业级 IR</strong></p>
+                <p>使用 LLVM IR<br>而非简单三地址码</p>
+            </div>
+            <div style="text-align: center;">
+                <p style="font-size: 2em;">🚀</p>
+                <p><strong>可执行验证</strong></p>
+                <p>JIT 即时编译<br>直接运行程序</p>
+            </div>
+            <div style="text-align: center;">
+                <p style="font-size: 2em;">🔧</p>
+                <p><strong>模块化设计</strong></p>
+                <p>各阶段独立<br>易于维护扩展</p>
+            </div>
+        </div>
+    </section>
+    <section>
+        <h3>设计模式应用</h3>
+        <table>
+            <tr><th>模式</th><th>应用场景</th><th>优势</th></tr>
+            <tr><td><strong>访问者模式</strong></td><td>AST 遍历</td><td>新增操作无需修改节点类</td></tr>
+            <tr><td><strong>工厂方法</strong></td><td>Token 创建</td><td>统一 Token 构造</td></tr>
+            <tr><td><strong>组合模式</strong></td><td>AST 节点</td><td>统一处理叶子/组合节点</td></tr>
+        </table>
+    </section>
+    <section>
+        <h3>与课程知识的对应</h3>
+        <table style="font-size: 0.9em;">
+            <tr><th>课程知识点</th><th>项目实现</th></tr>
+            <tr><td>正则表达式 & DFA</td><td>词法分析器的 Token 识别</td></tr>
+            <tr><td>上下文无关文法 (CFG)</td><td>EBNF 语法规范</td></tr>
+            <tr><td>自顶向下分析 (LL)</td><td>递归下降解析器</td></tr>
+            <tr><td>属性文法 & 类型系统</td><td>语义分析的类型检查</td></tr>
+            <tr><td>符号表 & 作用域</td><td>SymbolTable 实现</td></tr>
+            <tr><td>中间代码 & SSA</td><td>LLVM IR 生成</td></tr>
+        </table>
+    </section>
+    </section>
+</section>
+
+<!-- ==================== 10. 总结 ==================== -->
+<section>
+    <section data-background-gradient="linear-gradient(to bottom right, #1a1a2e, #0f3460)">
+        <div class="section-num">10</div>
+        <div class="section-title-box">
+            <h2 class="section-title">总结与展望</h2>
+            <div class="section-subtitle">Conclusion</div>
+        </div>
+    </section>
+    <section>
+        <h3>项目成果</h3>
+        <table>
+            <tr><th>阶段</th><th>实现方法</th><th>输出</th><th>状态</th></tr>
+            <tr><td>词法分析</td><td>手写扫描器</td><td>Token 流</td><td class="success">✅</td></tr>
+            <tr><td>语法分析</td><td>递归下降</td><td>AST</td><td class="success">✅</td></tr>
+            <tr><td>语义分析</td><td>访问者 + 符号表</td><td>类型信息</td><td class="success">✅</td></tr>
+            <tr><td>代码生成</td><td>llvmlite</td><td>LLVM IR</td><td class="success">✅</td></tr>
+            <tr><td>执行</td><td>JIT</td><td>程序输出</td><td class="success">✅</td></tr>
+        </table>
+    </section>
+    <section>
+        <h3>收获与体会</h3>
+        <ul style="font-size: 1.0em; line-height: 2.0;">
+            <li>💡 深入理解了编译器工作原理</li>
+            <li>💡 掌握了递归下降语法分析技术</li>
+            <li>💡 学会了符号表和类型系统设计</li>
+            <li>💡 了解了 LLVM 工业级编译器框架</li>
+            <li>💡 体会了模块化软件设计的重要性</li>
+        </ul>
+    </section>
+    <section>
+        <h3>未来展望</h3>
+        <ul style="font-size: 0.9em; line-height: 1.8;">
+            <li>🔮 支持更多数据类型（数组、结构体）</li>
+            <li>🔮 增加代码优化 Pass</li>
+            <li>🔮 生成独立可执行文件</li>
+            <li>🔮 增加更丰富的标准库</li>
+            <li>🔮 支持模块/包系统</li>
+        </ul>
+    </section>
+    <section data-background-gradient="linear-gradient(to bottom, #16213e, #1a1a2e)">
+        <h1 style="font-size: 5em; font-weight: 900; margin-bottom: 10px; text-transform: none;">Thank You!</h1>
+        <h3 style="color: #42affa; font-size: 2em; margin-bottom: 60px;">Q & A</h3>
+        
+        <div style="background: rgba(255, 255, 255, 0.05); padding: 40px; border-radius: 20px; display: inline-block; border: 1px solid #333;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 30px;">
+                <div style="text-align: right; border-right: 2px solid #555; padding-right: 30px;">
+                    <p style="font-size: 1.5em; font-weight: bold; margin: 0;">李易涵</p>
+                    <p style="font-size: 0.9em; color: #888; margin: 5px 0 0 0;">Simple-C Compiler</p>
+                </div>
+                <div style="text-align: left;">
+                    <p style="font-size: 1.1em; margin: 0; color: #aaa;">302023315218</p>
+                    <p style="font-size: 0.9em; margin: 10px 0 0 0; color: #4caf50;">Computer Science</p>
+                </div>
+            </div>
+        </div>
+        
+        <p style="margin-top: 60px; font-size: 0.8em; color: #666;">
+            Designed with <span style="color: #e91e63;">♥</span> by <strong>Li Yihan</strong>
+        </p>
+    </section>
+</section>
+
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.js"></script>
+    <script>
+        Reveal.initialize({
+            controls: true,
+            progress: true,
+            center: true,
+            hash: true,
+            // 关键设置：强制 16:9 宽屏比例
+            width: 1920,
+            height: 1080,
+            // 留白控制：增加到 0.12 以防止内容过宽（解决两侧太贴边的问题）
+            margin: 0.12,
+            // 限制缩放范围
+            minScale: 0.2,
+            maxScale: 2.0,
+            
+            plugins: [ RevealHighlight ],
+            // 打印 PDF 时必须开启
+            pdfSeparateFragments: false,
+        });
+    </script>
+</body>
+</html>

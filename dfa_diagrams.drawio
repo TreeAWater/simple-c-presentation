@@ -1,0 +1,110 @@
+<mxfile host="65bd71144e">
+    <diagram name="DFA-Integer" id="dfa-integer">
+        <mxGraphModel dx="542" dy="734" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="400" pageHeight="200" background="none" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title1" value="识别整数的 DFA" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontColor=#42affa;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="10" width="200" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="start1" value="" style="endArrow=classic;html=1;strokeColor=#888888;strokeWidth=2;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="30" y="100" as="sourcePoint"/>
+                        <mxPoint x="70" y="100" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="startLabel1" value="start" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#888888;" parent="1" vertex="1">
+                    <mxGeometry x="20" y="70" width="40" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="q0_1" value="q0" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;strokeColor=#42affa;strokeWidth=2;fillColor=#1a2e3e;fontColor=#ffffff;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="70" y="70" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="trans1" value="" style="endArrow=classic;html=1;strokeColor=#4caf50;strokeWidth=2;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="130" y="100" as="sourcePoint"/>
+                        <mxPoint x="200" y="100" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="transLabel1" value="digit" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#4caf50;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="145" y="70" width="40" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="q1_outer1" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;strokeColor=#4caf50;strokeWidth=3;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="197" y="67" width="66" height="66" as="geometry"/>
+                </mxCell>
+                <mxCell id="q1_inner1" value="q1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;strokeColor=#4caf50;strokeWidth=2;fillColor=#1a3a2a;fontColor=#ffffff;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="203" y="73" width="54" height="54" as="geometry"/>
+                </mxCell>
+                <mxCell id="loop1" value="" style="curved=1;endArrow=classic;html=1;strokeColor=#4caf50;strokeWidth=2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.3;entryDx=0;entryDy=0;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="230" y="67" as="sourcePoint"/>
+                        <mxPoint x="260" y="85" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="250" y="45"/>
+                            <mxPoint x="280" y="60"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="loopLabel1" value="digit" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#4caf50;" parent="1" vertex="1">
+                    <mxGeometry x="260" y="35" width="40" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="regex1" value="正则：[0-9]+" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#aaaaaa;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="155" width="200" height="25" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram name="DFA-Identifier" id="dfa-identifier">
+        <mxGraphModel dx="461" dy="624" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="400" pageHeight="200" background="none" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title2" value="识别标识符的 DFA" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontColor=#42affa;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="10" width="200" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="start2" value="" style="endArrow=classic;html=1;strokeColor=#888888;strokeWidth=2;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="30" y="100" as="sourcePoint"/>
+                        <mxPoint x="70" y="100" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="startLabel2" value="start" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#888888;" parent="1" vertex="1">
+                    <mxGeometry x="20" y="70" width="40" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="q0_2" value="q0" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;strokeColor=#42affa;strokeWidth=2;fillColor=#1a2e3e;fontColor=#ffffff;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="70" y="70" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="trans2" value="" style="endArrow=classic;html=1;strokeColor=#4caf50;strokeWidth=2;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="130" y="100" as="sourcePoint"/>
+                        <mxPoint x="200" y="100" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="transLabel2" value="letter" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#4caf50;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="145" y="70" width="40" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="q1_outer2" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;strokeColor=#4caf50;strokeWidth=3;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="197" y="67" width="66" height="66" as="geometry"/>
+                </mxCell>
+                <mxCell id="q1_inner2" value="q1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;strokeColor=#4caf50;strokeWidth=2;fillColor=#1a3a2a;fontColor=#ffffff;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="203" y="73" width="54" height="54" as="geometry"/>
+                </mxCell>
+                <mxCell id="loop2" value="" style="curved=1;endArrow=classic;html=1;strokeColor=#4caf50;strokeWidth=2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.3;entryDx=0;entryDy=0;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="230" y="67" as="sourcePoint"/>
+                        <mxPoint x="260" y="85" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="250" y="45"/>
+                            <mxPoint x="280" y="60"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="loopLabel2" value="letter | digit" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#4caf50;" parent="1" vertex="1">
+                    <mxGeometry x="255" y="35" width="60" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="regex2" value="正则：[a-zA-Z][a-zA-Z0-9]*" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#aaaaaa;" parent="1" vertex="1">
+                    <mxGeometry x="70" y="155" width="250" height="25" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
